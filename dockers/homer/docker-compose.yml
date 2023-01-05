@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  homer:
+    image: b4bz/homer
+    container_name: homer
+    restart: unless-stopped
+    user: 1000:1000
+    networks:
+      - traefik-proxy
+    volumes:
+      - assets:/www/assets
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homer.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.homer.service=homer"
+      - "traefik.http.routers.homer.entrypoints=websecure"
+      - "traefik.http.services.homer.loadbalancer.server.port=8080"
+      - "traefik.http.routers.homer.tls=true"
+      - "traefik.http.routers.homer.tls.certresolver=letsencrypt"
+      - "traefik.http.services.homer.loadbalancer.passhostheader=true"
+      - "traefik.http.routers.homer.middlewares=auth-homer"
+      - "traefik.http.middlewares.auth-homer.basicauth.users=${BASIC_AUTH}"
+
+volumes:
+  assets:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/store/homer/assets
+
+networks:
+  traefik-proxy:
+    external: true
