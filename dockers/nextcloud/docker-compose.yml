@@ -1,3 +1,5 @@
+version: "3"
+
 volumes:
   data:
     driver: local
@@ -43,7 +45,9 @@ services:
     user: 1000:1000
     volumes:
       - data:/var/www/html
-      - "./redis-session.ini:/usr/local/etc/php/conf.d/redis-session.ini"
+      - type: bind
+        source: ./redis-session.ini
+        target: /usr/local/etc/php/conf.d/redis-session.ini
     networks:
       - traefik-proxy
       - internal
@@ -83,10 +87,11 @@ services:
     image: nextcloud:25
     container_name: nextcloud-cron
     restart: unless-stopped
-    user: 1000:1000
     volumes:
       - data:/var/www/html
-      - "./redis-session.ini:/usr/local/etc/php/conf.d/redis-session.ini"
+      - type: bind
+        source: ./redis-session.ini
+        target: /usr/local/etc/php/conf.d/redis-session.ini
     entrypoint: /cron.sh
     depends_on:
       - postgres
