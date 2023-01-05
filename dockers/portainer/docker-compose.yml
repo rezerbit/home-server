@@ -1,7 +1,7 @@
 version: "3"
 services:
   portainer:
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer:latest
     container_name: portainer
     command: -H unix:///var/run/docker.sock
     volumes:
@@ -20,8 +20,6 @@ services:
       - "traefik.http.routers.portainer.tls=true"
       - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
       - "traefik.http.services.portainer.loadbalancer.passhostheader=true"
-      - "traefik.http.routers.portainer.middlewares=auth-portainer"
-      - "traefik.http.middlewares.auth-portainer.basicauth.users=${BASIC_AUTH}"
     restart: unless-stopped
     security_opt:
       - "no-new-privileges:true"
