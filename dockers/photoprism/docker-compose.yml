@@ -68,8 +68,11 @@ services:
     security_opt:
       - seccomp:unconfined
       - apparmor:unconfined
-    ports:
-      - "2342:2342" # HTTP port (host:container)
+    # ports:
+      # - "2342:2342" # HTTP port (host:container)
+    networks:
+      - traefik-proxy
+      - photoprism
     environment:
       PHOTOPRISM_ADMIN_USER: ${PHOTOPRISM_ADMIN_USER}                 # superadmin username
       PHOTOPRISM_ADMIN_PASSWORD: ${PHOTOPRISM_ADMIN_PASSWORD}          # initial superadmin password (minimum 8 characters)
@@ -129,6 +132,17 @@ services:
       # - "/example/family:/photoprism/originals/family" # *Additional* media folders can be mounted like this
       - "import:/photoprism/import"                  # *Optional* base folder from which files can be imported to originals
       - "storage:/photoprism/storage"                  # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.photoprism.rule=Host(`${PHOTOPRISM_SITE_URL}`)"
+      - "traefik.http.routers.photoprism.service=photoprism"
+      - "traefik.http.routers.photoprism.entrypoints=websecure"
+      - "traefik.http.services.photoprism.loadbalancer.server.port=2342"
+      - "traefik.http.routers.photoprism.tls=true"
+      - "traefik.http.routers.photoprism.tls.certresolver=letsencrypt"
+      - "traefik.http.services.photoprism.loadbalancer.passhostheader=true"
+      - "traefik.http.routers.photoprism.middlewares=auth-photoprism"
+      - "traefik.http.middlewares.auth-photoprism.basicauth.users=${BASIC_AUTH}"
 
   ## Database Server (recommended)
   ## see https://docs.photoprism.app/getting-started/faq/#should-i-use-sqlite-mariadb-or-mysql
@@ -137,6 +151,8 @@ services:
     ## https://docs.photoprism.app/getting-started/troubleshooting/#fatal-server-errors
     restart: unless-stopped
     image: mariadb:10.10
+    networks:
+      - photoprism
     security_opt: # see https://github.com/MariaDB/mariadb-docker/issues/434#issuecomment-1136151239
       - seccomp:unconfined
       - apparmor:unconfined
@@ -164,3 +180,8 @@ services:
       WATCHTOWER_POLL_INTERVAL: 7200 # checks for updates every two hours
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
+
+networks:
+  traefik-proxy:
+    external: true
+  photoprism:  
