@@ -1,11 +1,11 @@
 volumes:
-  nextcloud-data:
+  data:
     driver: local
     driver_opts:
       o: bind
       type: none
       device: /mnt/store/nextcloud/data
-  nextcloud-postgres:
+  postgres:
     driver: local
     driver_opts:
       o: bind
@@ -17,7 +17,7 @@ services:
     container_name: nextcloud-postgres
     image: postgres:15
     volumes:
-      - nextcloud-postgres:/var/lib/postgresql/data
+      - postgres:/var/lib/postgresql/data
     networks:
       - nextcloud
     environment:
@@ -37,7 +37,7 @@ services:
     image: nextcloud:25
     user: 1000:1000
     volumes:
-      - nextcloud-data:/var/www/html
+      - data:/var/www/html
     networks:
       - traefik-proxy
       - nextcloud

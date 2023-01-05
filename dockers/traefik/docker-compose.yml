@@ -1,5 +1,5 @@
 volumes:
-  traefik-certificates:
+  certificates:
     driver: local
     driver_opts:
       o: bind
@@ -32,7 +32,7 @@ services:
       - "--global.sendAnonymousUsage=false"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - traefik-certificates:/etc/traefik/acme
+      - certificates:/etc/traefik/acme
     networks:
       - traefik-proxy
     ports:
