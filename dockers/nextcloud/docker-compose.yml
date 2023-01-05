@@ -72,6 +72,8 @@ services:
       - "traefik.http.routers.nextcloud.tls=true"
       - "traefik.http.routers.nextcloud.tls.certresolver=letsencrypt"
       - "traefik.http.services.nextcloud.loadbalancer.passhostheader=true"
+      - "traefik.http.routers.nextcloud.middlewares=auth-nextcloud"
+      - "traefik.http.middlewares.auth-nextcloud.basicauth.users=${BASIC_AUTH}"
     restart: unless-stopped
     depends_on:
       postgres:
