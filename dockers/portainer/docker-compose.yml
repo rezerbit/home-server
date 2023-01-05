@@ -20,13 +20,15 @@ services:
       - "traefik.http.routers.portainer.tls=true"
       - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
       - "traefik.http.services.portainer.loadbalancer.passhostheader=true"
+      - "traefik.http.routers.portainer.middlewares=auth-portainer"
+      - "traefik.http.middlewares.auth-portainer.basicauth.users=${BASIC_AUTH}"
+
     restart: unless-stopped
     security_opt:
       - "no-new-privileges:true"
 
 volumes:
   data:
-
 
 networks:
   traefik-proxy:
