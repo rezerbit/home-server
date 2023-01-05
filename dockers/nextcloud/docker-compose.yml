@@ -84,7 +84,7 @@ services:
     container_name: nextcloud-cron
     restart: unless-stopped
     volumes:
-      - nextcloud-data:/var/www/html
+      - data:/var/www/html
     entrypoint: /cron.sh
     depends_on:
       - postgres
