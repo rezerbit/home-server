@@ -25,7 +25,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -h 127.0.0.1" ]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -h 127.0.0.1"
+        ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -83,6 +87,8 @@ services:
     depends_on:
       - postgres
       - redis
+    networks:
+      - nextcloud
 
   redis:
     image: redis:7
