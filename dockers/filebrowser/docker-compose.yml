@@ -7,7 +7,7 @@ services:
     volumes:
       - /mnt/store:/srv
       - type: bind
-        source: ./database.db
+        source: /mnt/store/filebrowser/database.db
         target: /database.db
     networks:
       - traefik-proxy
