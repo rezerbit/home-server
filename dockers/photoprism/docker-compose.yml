@@ -152,7 +152,7 @@ services:
     ## https://docs.photoprism.app/getting-started/troubleshooting/#fatal-server-errors
     restart: unless-stopped
     image: mariadb:10.10
-    container_name: mariadb
+    container_name: photoprism-mariadb
     networks:
       - photoprism
     security_opt: # see https://github.com/MariaDB/mariadb-docker/issues/434#issuecomment-1136151239
@@ -176,7 +176,7 @@ services:
   watchtower:
     restart: unless-stopped
     image: containrrr/watchtower
-    container_name: watchtower
+    container_name: photoprism-watchtower
     profiles: ["update"]
     environment:
       WATCHTOWER_CLEANUP: "true"
