@@ -86,6 +86,7 @@ services:
       - "traefik.http.middlewares.nextcloud-redirectregex2.redirectregex.permanent=true"
       - "traefik.http.middlewares.nextcloud-redirectregex2.redirectregex.regex=https?://([^/]*)(/.well-known[^#]*)"
       - "traefik.http.middlewares.nextcloud-redirectregex2.redirectregex.replacement=https://$${1}/index.php$${2}"
+      - "traefik.docker.network=traefik-proxy"
     restart: unless-stopped
     depends_on:
       postgres:
