@@ -144,6 +144,7 @@ services:
       - "traefik.http.services.photoprism.loadbalancer.passhostheader=true"
       - "traefik.http.routers.photoprism.middlewares=auth-photoprism"
       - "traefik.http.middlewares.auth-photoprism.basicauth.users=${BASIC_AUTH}"
+      - "traefik.docker.network=traefik-proxy"
 
   ## Database Server (recommended)
   ## see https://docs.photoprism.app/getting-started/faq/#should-i-use-sqlite-mariadb-or-mysql
