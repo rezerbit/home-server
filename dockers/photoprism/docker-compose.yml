@@ -1,12 +1,12 @@
 version: '3.5'
 
 volumes:
-  originals:
+  originals_rezerbit:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: /mnt/store/photoprism/originals
+      device: /mnt/store/nextcloud/data/data/rezerbit/files/pictures
 
   storage:
     driver: local
@@ -73,7 +73,7 @@ services:
       # - "2342:2342" # HTTP port (host:container)
     networks:
       - traefik-proxy
-      - photoprism
+      - internal
     environment:
       PHOTOPRISM_ADMIN_USER: ${PHOTOPRISM_ADMIN_USER}                 # superadmin username
       PHOTOPRISM_ADMIN_PASSWORD: ${PHOTOPRISM_ADMIN_PASSWORD}          # initial superadmin password (minimum 8 characters)
@@ -128,8 +128,7 @@ services:
     working_dir: "/photoprism" # do not change or remove
     ## Storage Folders: "~" is a shortcut for your home directory, "." for the current directory
     volumes:
-      # "/host/folder:/photoprism/folder"                # Example
-      - "originals:/photoprism/originals"               # Original media files (DO NOT REMOVE)
+      - originals_rezerbit:/photoprism/originals/rezerbit:ro
       # - "/example/family:/photoprism/originals/family" # *Additional* media folders can be mounted like this
       - "import:/photoprism/import"                  # *Optional* base folder from which files can be imported to originals
       - "storage:/photoprism/storage"                  # *Writable* storage folder for cache, database, and sidecar files (DO NOT REMOVE)
@@ -145,6 +144,9 @@ services:
       - "traefik.http.routers.photoprism.middlewares=auth-photoprism"
       - "traefik.http.middlewares.auth-photoprism.basicauth.users=${BASIC_AUTH}"
       - "traefik.docker.network=traefik-proxy"
+      - "ofelia.enabled=true"
+      - "ofelia.job-exec.photoprism_index.schedule=\"@every 1h\""
+      - "ofelia.job-exec.photoprism_index.command=\"photoprism index --cleanup\""
 
   ## Database Server (recommended)
   ## see https://docs.photoprism.app/getting-started/faq/#should-i-use-sqlite-mariadb-or-mysql
@@ -155,7 +157,7 @@ services:
     image: mariadb:10.10
     container_name: photoprism-mariadb
     networks:
-      - photoprism
+      - internal
     security_opt: # see https://github.com/MariaDB/mariadb-docker/issues/434#issuecomment-1136151239
       - seccomp:unconfined
       - apparmor:unconfined
@@ -185,7 +187,19 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
 
+  ofelia:
+    restart: unless-stopped
+    image: mcuadros/ofelia:latest
+    container_name: photoprism-ofelia
+    depends_on:
+      - photoprism
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - internal
+
 networks:
   traefik-proxy:
     external: true
-  photoprism:  
+  internal:  
