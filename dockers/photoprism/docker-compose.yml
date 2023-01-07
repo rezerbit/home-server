@@ -141,8 +141,6 @@ services:
       - "traefik.http.routers.photoprism.tls=true"
       - "traefik.http.routers.photoprism.tls.certresolver=letsencrypt"
       - "traefik.http.services.photoprism.loadbalancer.passhostheader=true"
-      - "traefik.http.routers.photoprism.middlewares=auth-photoprism"
-      - "traefik.http.middlewares.auth-photoprism.basicauth.users=${BASIC_AUTH}"
       - "traefik.docker.network=traefik-proxy"
       - "ofelia.enabled=true"
       - "ofelia.job-exec.photoprism_index.schedule=\"@every 1h\""
